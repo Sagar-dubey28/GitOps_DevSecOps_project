@@ -1,0 +1,30 @@
+# Assignment Checklist
+
+- [x] Python Hello World application
+- [x] Docker containerization
+- [x] Amazon ECR target
+- [x] GitHub Actions CI/CD
+- [x] Automated tests
+- [x] Trivy filesystem scan
+- [x] Trivy container scan
+- [x] Argo CD Application
+- [x] Helm deployment
+- [x] ALB Ingress
+- [x] ACM TLS configuration
+- [x] Rolling deployment
+- [x] HPA
+- [x] PDB
+- [x] Rollback procedure
+- [x] Application shutdown
+- [x] Node group cost optimization
+- [x] Startup procedure
+- [x] Architecture documentation
+- [x] Security documentation
+- [x] Operations runbook
+- [ ] Add real GitHub repository URL
+- [ ] Add real AWS account/region
+- [ ] Add real ACM certificate ARN
+- [ ] Configure AWS Load Balancer Controller
+- [ ] Configure GitHub-to-AWS authentication
+- [ ] Configure DNS records
+- [ ] Deploy and validate in your AWS account

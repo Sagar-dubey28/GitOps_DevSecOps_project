@@ -3,13 +3,18 @@
 ```mermaid
 flowchart LR
     DEV[Developer] --> GH[GitHub Repository]
+    TF[Terraform] --> VPC[VPC: public/private subnets]
+    TF --> EKS[EKS cluster + managed nodes]
+    TF --> ECR[Amazon ECR]
+    TF --> LBC[AWS Load Balancer Controller: IRSA + Helm]
     GH --> GA[GitHub Actions]
     GA --> TEST[Tests + Trivy]
-    TEST --> ECR[Amazon ECR]
-    ECR --> EKS[Amazon EKS]
+    TEST --> ECR
     GA -->|updates Helm image tag| GH
     GH --> ARGO[Argo CD]
     ARGO --> EKS
+    LBC --> EKS
+    VPC --> EKS
     EKS --> ALB[AWS Application Load Balancer]
     ALB --> APP[Python Flask Pods]
     ACM[AWS Certificate Manager] --> ALB

@@ -19,15 +19,13 @@ kubectl get nodes
 helm version
 ```
 
-## One-time AWS setup
+## Provision AWS infrastructure
 
-The EKS cluster must already have:
+The Terraform base root creates VPC/EKS/ECR, and `terraform/addons` installs controller IRSA and Helm resources after EKS exists. Follow the PowerShell commands in the repository README, and restrict the public EKS endpoint CIDRs in `terraform/terraform.tfvars` before applying.
 
-1. AWS Load Balancer Controller installed.
-2. An IAM role/service account configured for the controller.
-3. An ECR repository named `python-eks-gitops`.
-4. An ACM certificate in the same AWS region as the ALB.
-5. DNS records pointing the application hostname to the ALB after it is created.
+The ECR lookup requires AWS CLI credentials with `ecr:DescribeRepositories`; Terraform also needs permission to create the infrastructure and IAM resources. If a controller release or its ServiceAccount already exists in the AWS cluster outside this repository, inspect and import it into the add-ons Terraform state before applying.
+
+After Terraform, provide an ACM certificate ARN in the same region as the ALB and configure DNS to the ALB hostname after it is created.
 
 ## GitHub setup
 
@@ -38,7 +36,7 @@ AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 ```
 
-Set these values in `helm/python-app/values.yaml`:
+Set the ECR URL from `terraform -chdir=terraform output -raw ecr_repository_url`, plus these values, in `helm/python-app/values.yaml`:
 
 ```yaml
 image:

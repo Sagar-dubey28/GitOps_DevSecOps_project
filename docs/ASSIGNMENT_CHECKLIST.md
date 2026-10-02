@@ -21,10 +21,13 @@
 - [x] Architecture documentation
 - [x] Security documentation
 - [x] Operations runbook
+- [x] Terraform VPC, EKS, managed node group, and ECR
+- [x] EKS OIDC/IRSA and AWS Load Balancer Controller Helm deployment
 - [ ] Add real GitHub repository URL
 - [ ] Add real AWS account/region
 - [ ] Add real ACM certificate ARN
-- [ ] Configure AWS Load Balancer Controller
+- [ ] Review Terraform variables and restrict EKS API endpoint access
+- [ ] Apply Terraform infrastructure and controller add-ons
 - [ ] Configure GitHub-to-AWS authentication
 - [ ] Configure DNS records
 - [ ] Deploy and validate in your AWS account

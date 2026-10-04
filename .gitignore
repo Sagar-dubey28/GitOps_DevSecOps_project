@@ -1,0 +1,11 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+!*.tfvars.example
+.kube/
+.env
+.DS_Store
+__pycache__/
+*.pyc

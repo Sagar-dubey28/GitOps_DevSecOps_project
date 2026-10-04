@@ -1,0 +1,40 @@
+# Assignment Checklist
+
+- [x] Python Hello World application
+- [x] Gunicorn/Flask container
+- [x] Health endpoint
+- [x] Readiness endpoint
+- [x] Dockerfile and .dockerignore
+- [x] Amazon ECR repository
+- [x] GitHub Actions CI/CD
+- [x] Unit tests
+- [x] Trivy filesystem scan
+- [x] Trivy image scan before push
+- [x] Immutable Git SHA image tags
+- [x] Argo CD Application
+- [x] Helm chart
+- [x] AWS Load Balancer Controller
+- [x] ALB Ingress
+- [x] Application ACM TLS
+- [x] Argo CD UI ACM TLS
+- [x] Rolling deployment
+- [x] HPA
+- [x] Metrics Server
+- [x] PDB
+- [x] GitOps rollback
+- [x] Emergency Kubernetes rollback
+- [x] Shutdown procedure
+- [x] Startup procedure
+- [x] Node group scale-to-zero scripts
+- [x] VPC, public/private subnets, IGW, NAT, route tables
+- [x] EKS cluster and managed node group
+- [x] EKS OIDC/IRSA
+- [x] AWS Load Balancer Controller IAM policy/role
+- [x] Optional Argo CD repo-server IRSA role
+- [ ] Replace GitHub repository URL
+- [ ] Replace AWS account ID
+- [ ] Replace ACM certificate ARNs
+- [ ] Configure DNS
+- [ ] Configure GitHub OIDC or access-key secrets
+- [ ] Restrict EKS API endpoint CIDRs
+- [ ] Run Terraform and validate the deployed environment

@@ -1,0 +1,150 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  id-token: write
+  security-events: write
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: python-eks-gitops
+
+jobs:
+  test:
+    name: Test Python application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt pytest
+
+      - name: Compile
+        run: python -m compileall app
+
+      - name: Unit tests
+        run: |
+          cat > app/test_app.py <<'EOF'
+          from app.app import app
+
+          def test_health():
+              client = app.test_client()
+              response = client.get("/health")
+              assert response.status_code == 200
+
+          def test_ready():
+              client = app.test_client()
+              response = client.get("/ready")
+              assert response.status_code == 200
+          EOF
+          PYTHONPATH=. pytest -q
+
+  filesystem-security:
+    name: Trivy filesystem scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  build-scan-push:
+    name: Build, scan and push image
+    needs: [test, filesystem-security]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS with OIDC
+        if: ${{ vars.AWS_ROLE_TO_ASSUME != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure AWS with access keys
+        if: ${{ vars.AWS_ROLE_TO_ASSUME == '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: docker build -t "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" -f app/Dockerfile app
+
+      - name: Scan local image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Push immutable image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: docker push "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  update-gitops:
+    name: Commit GitOps image tag
+    needs: build-scan-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Helm image tag
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os, re
+
+          p = Path("helm/python-app/values.yaml")
+          text = p.read_text()
+          updated, count = re.subn(
+              r'(?m)^  tag: ".*"$',
+              f'  tag: "{os.environ["IMAGE_TAG"]}"',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("Could not find helm image tag in values.yaml")
+          p.write_text(updated)
+          PY
+
+      - name: Commit and push GitOps change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add helm/python-app/values.yaml
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: deploy image ${{ github.sha }}"
+          git push

@@ -1,0 +1,16 @@
+# Root-level Docker context exclusions.
+# The production image is built with app/ as the Docker build context,
+# therefore app/.dockerignore is the file used by `docker build -f app/Dockerfile app`.
+.git/
+.github/
+terraform/
+helm/
+argocd/
+k8s/
+docs/
+scripts/
+.env
+*.tfstate
+*.tfplan
+__pycache__/
+*.pyc

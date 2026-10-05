@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   # Replace ACCOUNT_ID with your AWS account ID.
   repository: 200340799102.dkr.ecr.ap-southeast-2.amazonaws.com/python-eks-gitops
-  tag: "initial"
+  tag: "c00aebbfad601bf3a56dbf84bed301cd87259c10"
   pullPolicy: IfNotPresent
 
 containerPort: 8080

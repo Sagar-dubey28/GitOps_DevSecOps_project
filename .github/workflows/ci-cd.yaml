@@ -36,6 +36,7 @@ jobs:
 
       - name: Unit tests
         run: |
+          touch app/__init__.py
           cat > app/test_app.py <<'EOF'
           from app.app import app
 
@@ -49,7 +50,7 @@ jobs:
               response = client.get("/ready")
               assert response.status_code == 200
           EOF
-          PYTHONPATH=. pytest -q
+          PYTHONPATH=. pytest app/test_app.py -q
 
   filesystem-security:
     name: Trivy filesystem scan

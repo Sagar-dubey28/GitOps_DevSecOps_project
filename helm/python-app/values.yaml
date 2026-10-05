@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   # Replace ACCOUNT_ID with your AWS account ID.
-  repository: ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/python-eks-gitops
+  repository: 200340799102.dkr.ecr.ap-southeast-2.amazonaws.com/python-eks-gitops
   tag: "initial"
   pullPolicy: IfNotPresent
 
@@ -49,7 +49,7 @@ ingress:
   enabled: true
   className: alb
   host: project.sagardubey.in
-  certificateArn: arn:aws:acm:ap-south-1:ACCOUNT_ID:certificate/REPLACE_ME
+  certificateArn: arn:aws:acm:ap-southeast-2:200340799102:certificate/be935e84-d872-47cc-a3d0-272241f1a433
   healthcheckPath: /health
 
 autoscaling:

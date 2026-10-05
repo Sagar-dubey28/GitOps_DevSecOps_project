@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_GITHUB_USER/python-eks-gitops.git
+    repoURL: https://github.com/Sagar-dubey28/GitOps_DevSecOps_project.git
     targetRevision: main
     path: helm/python-app
     helm:
